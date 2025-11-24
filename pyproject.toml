@@ -6,10 +6,28 @@ readme = "README.md"
 authors = [
     { name = "Antony", email = "antonygradillas@gmail.com" }
 ]
+maintainers = [
+    {name = "Antony", email = "antonygradillas@gmail.com"}
+]
 requires-python = ">=3.12"
 dependencies = [
     "mariadb>=1.1.14",
 ]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+keywords = ["mariadb", "automation", "sql"]
+classifiers = [
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Build Tools",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Homepage = "https://github.com/avgra3/convert-database"
+Repository = "https://github.com/avgra3/convert-database"
+Issues = "https://github.com/avgra3/convert-database/issues"
 
 [project.scripts]
 convert-database-tool = "convert_database_tool.main:main"
