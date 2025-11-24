@@ -1,0 +1,7 @@
+[database_config]
+database = ""
+local_infile = false
+user = "USERNAME"
+password = "PASSWORD"
+host = "localhost"
+port = 3306

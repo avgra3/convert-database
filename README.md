@@ -1,0 +1,132 @@
+# Convert Database Tool
+
+This application is **only** available here on Github.
+
+## Setup
+
+### Prerequisites
+
+This application relies on the [MariaDB C Connector](https://mariadb.com/docs/connectors/mariadb-connector-c/install-mariadb-connector-c).
+
+If you encounter any issues installing the app, please confirm your installation of the MariaDB Connector C package.
+
+### Using pip
+
+```bash
+pip install --user git+https://github.com/avgra3/convert-database.git
+```
+or
+
+```bash
+git clone https://github.com/avgra3/convert-database.git
+cd ./convert-database.git
+python -m pip install --user .
+```
+
+### UV
+
+Installing locally
+
+```bash
+uv add git+https://github.com/avgra3/convert-database.git@main
+```
+
+Installing globally
+
+```bash
+uv tool install "git+https://github.com/avgra3/convert-database.git@main"
+```
+
+Upgrading
+
+```bash
+uv tool upgrade "git+https://github.com/avgra3/convert-database.git@main"
+```
+
+## Running
+
+```bash
+# This prints out the help information for further commands that are needed
+convert-database-tool --help
+```
+
+**Note:** This app assumes you are trying to update from your computer (localhost). To confirm your configuration is correct, run the following two commands and update those files as neccessary:
+
+```bash
+# Returns path to database configuration. Ensure username, password, hostname, and port are all correct.
+convert-database-tool --dbConfig
+
+# Returns path to the query that generates the needed alterations.
+convert-database-tool --query
+```
+
+Run the following, making sure to use substitute `DB_NAME` with the database you want to update:
+
+```bash
+convert-database-tool --db DB_NAME
+```
+
+**Note:** This could take a while so **do not** restart MariaDB until it finishes. You will notice logging information while the application is running. You can also monitor the updates using your preferred MariaDB server monitoring software to see what is actually being run.
+
+### Other Considerations
+
+Before running, make sure the database configurations are correct. They are located in the [dbConfig.toml]("./src/convert_database_tool/configs/dbConfig.toml") file. If you have already installed the app, run `convert-database-tool --dbConfig` to get the path to the configuration file.
+
+#### Database Configuration
+
+The below is the default configuration. If you get errors connecting to a database the below may need to be changed.
+
+```toml
+[database_config]
+database = "" # Update this field if you always want to default to a specific database (not reccomended).
+local_infile = false
+user = "USERNAME"
+password = "PASSWORD"
+host = "localhost" # If connecting to a different server than the one running the script on, you will need to change this.
+port = 3306 # This is the default port and unlikely to change.
+```
+
+#### Errors
+
+Errors may show in the terminal while the tool is running. Most errors will come from MariaDB and can include the following:
+
+- Altering a field with VARCHAR set to the max size with message like "Row size too large. The maximum row size for the used ..."
+    - As long as the app does not exit, you other tables will continue to be altered
+- Incorrect username or password with message like "Access denied for user 'user'@'localhost'"
+    - You will need to confirm the database configuration file is correct. Specifically you will need to verify the username, password, and hostname are correct.
+    - The likely issue will be the password.
+    - If the app is installed (see below), you can run the command `convert-database-tool --dbConfig` to get the config file location.
+
+## How Does this Work?
+
+This app uses multiple processes to run a set of alter scripts on all ARIA tables, making sure to skip views. You will receive logs in your terminal if an error occured. Otherwise there is no output.
+
+## Global Installation
+### Pip
+
+```bash
+# From the root directory of the project (where this README.md is located).
+python3 -m pip install --user .
+```
+
+### UV
+Using [uv](https://docs.astral.sh/uv/getting-started/installation/):
+
+```bash
+# From the root directory of the project (where this README.md is located).
+uv tool install --reinstall .
+```
+
+Assuming uv is on your `PATH` environment variable, you should be able to run the command as follows:
+
+```bash
+convert-database-tool --help
+```
+
+### Pipx
+
+How to [setup](https://pipx.pypa.io/stable/installation/).
+
+```bash
+pipx install convert-database-tool
+```

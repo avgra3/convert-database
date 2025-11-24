@@ -1,0 +1,28 @@
+[project]
+name = "convert-database-tool"
+version = "0.2.1"
+description = "A simple tool to make updates to a database."
+readme = "README.md"
+authors = [
+    { name = "Antony", email = "antonygradillas@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "mariadb>=1.1.14",
+]
+
+[project.scripts]
+convert-database-tool = "convert_database_tool.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+convert-database-tool = [
+    "SCRIPTS/*.sql",
+    "configs/dbConfig.toml",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
