@@ -40,7 +40,7 @@ def main():
     if args.query:
         script_location()
         return
-    if args.update_field is not None:
+    if args.field_update is not None:
         if args.value is not None:
             update_field(field_name=args.field_update, value=args.value)
         else:
