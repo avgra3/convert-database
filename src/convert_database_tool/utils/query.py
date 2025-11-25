@@ -1,12 +1,12 @@
 import mariadb
-from multiprocessing import cpu_count, Process
+from multiprocessing import cpu_count, Pool
 from .constants import LOGGER
 from logging import Logger
 
 
 class Conversion:
     def __init__(self, dbCons: dict[str, any], log: Logger = LOGGER):
-        self.pool_size = cpu_count() // 2
+        self.pool_size = min(cpu_count() // 2, 16)
         self.log = log
         self.dbCons = dbCons
 
@@ -27,28 +27,31 @@ class Conversion:
             yield alters[i : i + self.pool_size]
 
     def run_queries(self, queries: list[tuple[str]]) -> None:
-        for tup in queries:
-            for q in tup:
-                split_results = q.split(";")
-                for split in split_results:
-                    if split.strip() == "":
-                        continue
-                    try:
-                        with mariadb.connect(**self.dbCons) as conn:
-                            cur = conn.cursor()
-                            cur.execute(split)
-                    except Exception as e:
-                        self.log.critical(
-                            "An exception occured. Please review the error given"
-                        )
-                        self.log.critical(e)
+        for sql_scripts in queries:
+            split = sql_scripts.split(";")
+            for split in split:
+                if split.strip() == "":
+                    continue
+                try:
+                    with mariadb.connect(self.dbCons) as conn:
+                        cur = conn.cursor()
+                        cur.execute(statement=split)
+                        cur.close()
+                except mariadb.ProgrammingError as e:
+                    self.log.warning(
+                            "An exception occured."
+                    )
+                    self.log.warning("Exception occured while running:")
+                    self.log.warning(split)
+                    self.log.warning("Please review the error given.")
+                    self.log.warning(e)
+                except mariadb.Error as e:
+                    error_message = "An occured while running the previous sql. Review the error message for detauls"
+                    self.log.error(error_message)
+                    self.log.error(e)
 
     def run_alters_mp(self, alters: list[tuple[str]]):
-        mp = []
-        for chunk in self.__chunks(alters=alters):
-            process = Process(target=self.run_queries, args=(chunk,))
-            mp.append(process)
-            process.start()
+        max_workers = min(cpu_count() // 2, 16)
+        with Pool(processes=max_workers) as pool:
+            pool.map(self.run_queries, alters)
 
-        for p in mp:
-            p.join()
