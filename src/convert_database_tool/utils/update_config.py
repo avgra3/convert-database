@@ -1,4 +1,4 @@
-from constants import db_config_toml, LOGGER, db_config_file
+from convert_database_tool.utils.constants import db_config_toml, LOGGER, db_config_file
 from tomlkit import dumps, document
 
 
