@@ -3,6 +3,7 @@ from convert_database_tool.utils.constants import LOGGER, get_config_file, get_d
 from convert_database_tool.utils.update_config import update_field
 from convert_database_tool.utils.update_sql import update_query
 import argparse
+from pathlib import Path
 
 
 def main():
@@ -51,7 +52,11 @@ def main():
         if args.value is None:
             LOGGER.warning("You did not provide a file to swap to")
             return
-        update_query(file=args.value)
+        if not Path(args.value).exists():
+            LOGGER.warning(f"`{args.value}` does not exist")
+        if not Path(args.value).is_file():
+            LOGGER.warning(f"`{args.value}` is not a file")
+        update_query(file=Path(args.value))
         return
     if args.field_update is not None:
         if args.value is not None:

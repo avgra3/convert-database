@@ -2,7 +2,7 @@ from convert_database_tool.utils.constants import get_data_file, LOGGER
 from pathlib import Path
 
 
-def update_query(file: str | Path) -> None:
+def update_query(file: Path) -> None:
     # get current config file location
     current_file = get_data_file(name="get_tables_to_convert.sql")
     # save old file with appended name of OLD and timestamp
