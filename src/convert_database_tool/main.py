@@ -1,6 +1,7 @@
 from convert_database_tool.utils.utils import getTablesToConvert, alterTables
 from convert_database_tool.utils.constants import LOGGER, get_config_file, get_data_file
 from convert_database_tool.utils.update_config import update_field
+from convert_database_tool.utils.update_sql import update_query
 import argparse
 
 
@@ -28,10 +29,16 @@ def main():
         "--field_update",
         help="Update a field such as `username`, `password`, `hostname`, `port`",
     )
+    group.add_argument(
+        "-m",
+        "--query_update",
+        action="store_true",
+        help="Update the SQL update file",
+    )
     parser.add_argument(
         "-v",
         "--value",
-        help="Field value to set. Needed to update a field.",
+        help="Field value or new SQL query file to set.",
     )
     args = parser.parse_args()
     if args.dbConfig:
@@ -39,6 +46,12 @@ def main():
         return
     if args.query:
         script_location()
+        return
+    if args.query_update:
+        if args.value is None:
+            LOGGER.warning("You did not provide a file to swap to")
+            return
+        update_query(file=args.value)
         return
     if args.field_update is not None:
         if args.value is not None:
