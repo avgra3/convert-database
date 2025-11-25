@@ -1,5 +1,6 @@
 from convert_database_tool.utils.utils import getTablesToConvert, alterTables
 from convert_database_tool.utils.constants import LOGGER, get_config_file, get_data_file
+from convert_database_tool.utils.update_config import update_field
 import argparse
 
 
@@ -22,12 +23,28 @@ def main():
         action="store_true",
         help="Get location of query ran by the app to make the update(s)",
     )
+    group.add_argument(
+        "-f",
+        "--field_update",
+        help="Update a field such as `username`, `password`, `hostname`, `port`",
+    )
+    parser.add_argument(
+        "-v",
+        "--value",
+        help="Field value to set. Needed to update a field.",
+    )
     args = parser.parse_args()
     if args.dbConfig:
         config_location()
         return
     if args.query:
         script_location()
+        return
+    if args.update_field is not None:
+        if args.value is not None:
+            update_field(field_name=args.field_update, value=args.value)
+        else:
+            LOGGER.warning("You did not provide a value to change field to")
         return
     LOGGER.info("Starting process...")
     tables_to_alter = getTablesToConvert(database=args.db)
