@@ -13,7 +13,7 @@ def update_query(file: Path) -> None:
     )
     LOGGER.info(f"Renamed previous sql to => `{renamed_file.as_posix()}`")
     # save new file to old's name sans OLD and timestamp
-    with open("get_tables_to_convert.sql", "w") as f:
+    with open(current_file.parent / "get_tables_to_convert.sql", "w") as f:
         f.write(file.read_text())
     LOGGER.info("Successfully updated file")
 
