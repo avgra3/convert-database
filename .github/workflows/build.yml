@@ -31,7 +31,7 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Build package
-        run: uv build --python-version ${{ matrix.python-version }}
+        run: uv build --python ${{ matrix.python-version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
