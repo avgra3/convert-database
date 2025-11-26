@@ -1,5 +1,9 @@
 from convert_database_tool.utils.utils import getTablesToConvert, alterTables
-from convert_database_tool.utils.constants import LOGGER, get_config_file, get_data_file
+from convert_database_tool.utils.constants import (
+    LOGGER,
+    get_config_file,
+    get_data_file,
+)
 from convert_database_tool.utils.update_config import update_field
 from convert_database_tool.utils.update_sql import update_query
 import argparse
@@ -28,7 +32,8 @@ def main():
     group.add_argument(
         "-f",
         "--field_update",
-        help="Select a field such as `user`, `password`, `host`, `port`. Update the value with the -v flag below.",
+        help="""Select a field such as `user`, `password`, `host`, `port`.
+        Update the value with the -v flag below.""",
     )
     group.add_argument(
         "-m",
@@ -67,8 +72,9 @@ def main():
     LOGGER.info("Starting process...")
     tables_to_alter = getTablesToConvert(database=args.db)
     alterTables(database=args.db, alters=tables_to_alter)
+    LOGGER.info("Finished.")
     LOGGER.info(
-        "Finished. Please review the database and any errors which may have occurred."
+        "Please review the database and any errors which may have occurred."
     )
 
 

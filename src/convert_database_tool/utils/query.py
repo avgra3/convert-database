@@ -19,7 +19,9 @@ class Conversion:
                 cur.execute(script)
                 results = cur.fetchall()
         except Exception as e:
-            self.log.critical("An exception occured, please review the error given")
+            self.log.critical(
+                "An exception occured, please review the error given"
+            )
             self.log.critical(e)
         return results
 
@@ -46,15 +48,14 @@ class Conversion:
                         cur.execute(statement=split)
                         cur.close()
                 except mariadb.ProgrammingError as e:
-                    self.log.warning(
-                            "An exception occured."
-                    )
+                    self.log.warning("An exception occured.")
                     self.log.warning("Exception occured while running:")
                     self.log.warning(split)
                     self.log.warning("Please review the error given.")
                     self.log.warning(e)
                 except mariadb.Error as e:
-                    error_message = "An occured while running the previous sql. Review the error message for detauls"
+                    error_message = "An occured while running the previous sql"
+                    error_message += " Review the error message for details."
                     self.log.error(error_message)
                     self.log.error(e)
 
@@ -62,4 +63,3 @@ class Conversion:
         max_workers = min(cpu_count() // 2, 16)
         with Pool(processes=max_workers) as pool:
             pool.map(self.run_queries, alters)
-
