@@ -28,7 +28,7 @@ def main():
     group.add_argument(
         "-f",
         "--field_update",
-        help="Update a field such as `username`, `password`, `hostname`, `port`",
+        help="Select a field such as `user`, `password`, `host`, `port`. Update the value with the -v flag below.",
     )
     group.add_argument(
         "-m",
