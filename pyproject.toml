@@ -1,6 +1,6 @@
 [project]
 name = "convert-database-tool"
-version = "0.2.1"
+version = "0.2.2"
 description = "A simple tool to make updates to a database."
 readme = "README.md"
 authors = [
@@ -12,6 +12,7 @@ maintainers = [
 requires-python = ">=3.12"
 dependencies = [
     "mariadb>=1.1.14",
+    "tomlkit>=0.13.3",
 ]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
@@ -41,6 +42,17 @@ convert-database-tool = [
     "configs/dbConfig.toml",
 ]
 
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.lint]
+extend-select = ["E501"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.6",
+]
