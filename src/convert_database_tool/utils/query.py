@@ -27,13 +27,19 @@ class Conversion:
             yield alters[i : i + self.pool_size]
 
     def run_queries(self, queries: list[tuple[str]]) -> None:
+        pool = mariadb.ConnectionPool(
+            pool_name=f"query_runner_{self.pool_number:02}",
+            pool_size=1,
+            **self.dbCons,
+        )
+
         for sql_scripts in queries:
             split = sql_scripts.split(";")
             for split in split:
                 if split.strip() == "":
                     continue
                 try:
-                    with mariadb.connect(self.dbCons) as conn:
+                    with pool.get_connection() as conn:
                         cur = conn.cursor()
                         cur.execute(statement=split)
                         cur.close()
