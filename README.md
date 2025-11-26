@@ -1,5 +1,9 @@
 # Convert Database Tool
 
+## How Does this Work?
+
+This app uses multiple processes to run a set of alter scripts on all ARIA tables, making sure to skip views. You will receive logs in your terminal where the application starts and when an error occurs.
+
 This application is **only** available here on Github.
 
 ## Setup
@@ -10,28 +14,28 @@ This application relies on the [MariaDB C Connector](https://mariadb.com/docs/co
 
 If you encounter any issues installing the app, please confirm your installation of the MariaDB Connector C package.
 
+Optionally, you will neeed to have [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed if you do not want to download this repository to insall the application.
+
 ### Using pip
 
 ```bash
-pip install --user git+https://github.com/avgra3/convert-database.git
+python -m venv .venv
+source .venv/bin/activate
+pip install "git+https://github.com/avgra3/convert-database.git@main"
 ```
 or
 
 ```bash
 git clone https://github.com/avgra3/convert-database.git
 cd ./convert-database.git
-python -m pip install --user .
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install .
 ```
 
 ### UV
 
-Installing locally
-
-```bash
-uv add git+https://github.com/avgra3/convert-database.git@main
-```
-
-Installing globally
+Documentation on setting up [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
 ```bash
 uv tool install "git+https://github.com/avgra3/convert-database.git@main"
@@ -43,6 +47,13 @@ Upgrading
 uv tool upgrade "git+https://github.com/avgra3/convert-database.git@main"
 ```
 
+### Pipx
+
+How to [setup](https://pipx.pypa.io/stable/installation/).
+
+```bash
+pipx install convert-database-tool
+```
 ## Running
 
 ```bash
@@ -97,36 +108,7 @@ Errors may show in the terminal while the tool is running. Most errors will come
     - The likely issue will be the password.
     - If the app is installed (see below), you can run the command `convert-database-tool --dbConfig` to get the config file location.
 
-## How Does this Work?
+## Development Branch
 
-This app uses multiple processes to run a set of alter scripts on all ARIA tables, making sure to skip views. You will receive logs in your terminal if an error occured. Otherwise there is no output.
+If you would like to use the latest _(and likely unstable)_ version use the "dev" branch. Please note, this version has no gurantees to actually work.
 
-## Global Installation
-### Pip
-
-```bash
-# From the root directory of the project (where this README.md is located).
-python3 -m pip install --user .
-```
-
-### UV
-Using [uv](https://docs.astral.sh/uv/getting-started/installation/):
-
-```bash
-# From the root directory of the project (where this README.md is located).
-uv tool install --reinstall .
-```
-
-Assuming uv is on your `PATH` environment variable, you should be able to run the command as follows:
-
-```bash
-convert-database-tool --help
-```
-
-### Pipx
-
-How to [setup](https://pipx.pypa.io/stable/installation/).
-
-```bash
-pipx install convert-database-tool
-```
