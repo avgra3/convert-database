@@ -14,7 +14,7 @@ This application relies on the [MariaDB C Connector](https://mariadb.com/docs/co
 
 If you encounter any issues installing the app, please confirm your installation of the MariaDB Connector C package.
 
-Optionally, you will neeed to have [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed if you do not want to download this repository to insall the application.
+Optionally, you will neeed to have [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed if you do not want to download this repository to install the application.
 
 ### Using pip
 
