@@ -9,6 +9,7 @@ class Conversion:
         self.pool_size = min(cpu_count() // 2, 16)
         self.log = log
         self.dbCons = dbCons
+        self.pool_number = 0
 
     def getTablesToConvert(self, script: str) -> list[tuple[str]]:
         results = []
@@ -32,6 +33,7 @@ class Conversion:
             pool_size=1,
             **self.dbCons,
         )
+        self.pool_number += 1
 
         for sql_scripts in queries:
             split = sql_scripts.split(";")
