@@ -1,5 +1,5 @@
 import mariadb
-from multiprocessing import cpu_count, Pool
+from multiprocessing import cpu_count, Pool, freeze_support
 from .constants import LOGGER
 from logging import Logger
 
@@ -25,25 +25,13 @@ class Conversion:
             self.log.critical(e)
         return results
 
-    def __chunks(self, alters: list[tuple[str]]):
-        for i in range(0, len(alters), self.pool_size):
-            yield alters[i : i + self.pool_size]
-
     def run_queries(self, queries: list[tuple[str]]) -> None:
-        pool = mariadb.ConnectionPool(
-            pool_name=f"query_runner_{self.pool_number:02}",
-            pool_size=1,
-            **self.dbCons,
-        )
-        self.pool_number += 1
-
         for sql_scripts in queries:
-            split = sql_scripts.split(";")
-            for split in split:
+            for split in sql_scripts.split(";"):
                 if split.strip() == "":
                     continue
                 try:
-                    with pool.get_connection() as conn:
+                    with mariadb.connect(self.dbCons) as conn:
                         cur = conn.cursor()
                         cur.execute(statement=split)
                         cur.close()
@@ -60,6 +48,8 @@ class Conversion:
                     self.log.error(e)
 
     def run_alters_mp(self, alters: list[tuple[str]]):
-        max_workers = min(cpu_count() // 2, 16)
-        with Pool(processes=max_workers) as pool:
+        if len(alters) < self.pool_size:
+            self.pool_size = len(alters)
+        freeze_support()
+        with Pool(processes=self.pool_size) as pool:
             pool.map(self.run_queries, alters)
