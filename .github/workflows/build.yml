@@ -55,10 +55,18 @@ jobs:
       - name: Show what we have
         run: ls -R all-dist
 
-      - name: Create GitHub Release with all wheels + sdist
-        uses: softprops/action-gh-release@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Create Release
+        id: create_release
+        uses: comnoco/create-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           generate_release_notes: false
+          draft: false
+          prerelease: false
           files: |
             all-dist/**/*
