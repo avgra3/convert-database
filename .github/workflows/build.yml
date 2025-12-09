@@ -14,24 +14,25 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version:
+          - "3.12"
+          - "3.13"
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          fetch-depth: 0  # Useful if using git-based versioning
+          fetch-depth: 0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
-          enable-cache: true
-          cache-dependency-glob: 'uv.lock'  # Cache if you use uv.lock
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
 
       - name: Build package
-        run: uv build --python ${{ matrix.python-version }}
+        run: uv build --python ${{ matrix.python-version }} --out-dir ./dist/py${{ matrix.python-version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -39,7 +40,7 @@ jobs:
           name: dist-py${{ matrix.python-version }}
           path: dist/*
           if-no-files-found: error
-          
+
   create-release:
     needs: build
     runs-on: ubuntu-latest
