@@ -71,7 +71,9 @@ def main():
         "-c",
         "--config-update",
         type=parse_dict,
-        help="Update the config file with a new value: {key: value}",
+        # type=str,
+        # nargs="+",
+        help="Update the config file with a new value: key=value",
     )
 
     # Run alterations
@@ -125,10 +127,15 @@ def main():
 
 def parse_dict(input: str) -> dict:
     try:
-        out = json.loads(input)
+        out = json.loads(
+            input.replace("'", '"')
+            .replace("True", "true")
+            .replace("False", "false")
+        )
         return out
-    except:
+    except Exception as e:
         LOGGER.critical(f"Unable to parse input: `{input}`")
+        LOGGER.critical(e)
         return {}
 
 
