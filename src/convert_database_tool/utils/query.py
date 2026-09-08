@@ -25,4 +25,6 @@ class Conversion:
 
     def run_all(self, *, getting_sql_tables: str) -> None:
         tables_to_convert = self.getTablesToConvert(script=getting_sql_tables)
+        if tables_to_convert is None or len(tables_to_convert) == 0:
+            return
         self.run_queries(queries=tables_to_convert)
