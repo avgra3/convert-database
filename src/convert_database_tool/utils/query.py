@@ -9,16 +9,14 @@ class Conversion:
         self.log = self.dbPool.log
 
     def getTablesToConvert(self, script: str) -> list[str]:
-        query_result: list[NeilResult] = self.dbPool.execute_script(
-            sql_script=script
+        query_result: NeilResult = self.dbPool.execute_sql(
+            sql=script
         )
-        results: list[str] = [
-            "; ".join(
-                (str(s) for s in sql.returnedData if str(s).strip() != "")
-            )
-            for sql in query_result
-            if sql.returnedData is not None
-        ]
+        for err in query_result.errors:
+            self.dbPool.log.critical(err)
+        if query_result.returnedData is None:
+            return
+        results: list[str] = [sql for sql in query_result.returnedData]
         return results
 
     def run_queries(self, queries: list[str]) -> None:
@@ -28,5 +26,6 @@ class Conversion:
     def run_all(self, *, getting_sql_tables: str) -> None:
         tables_to_convert = self.getTablesToConvert(script=getting_sql_tables)
         if tables_to_convert is None or len(tables_to_convert) == 0:
+            self.dbPool.log.warning("no data returned")
             return
         self.run_queries(queries=[sql for sql in tables_to_convert if sql.strip() != "" and sql.strip() !=";"])

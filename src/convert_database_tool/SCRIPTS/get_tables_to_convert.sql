@@ -1,4 +1,3 @@
-
 (
 SELECT CONCAT('ALTER DATABASE ',`SCHEMATA`.`SCHEMA_NAME`,' CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_520_ci`;') AS TO_CHANGE
 FROM `information_schema`.`SCHEMATA`
