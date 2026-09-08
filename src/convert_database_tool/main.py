@@ -108,11 +108,8 @@ def main():
             if args.querry_update:
                 update_query(file=args.query)
             if args.config_update:
-                map(
-                    update_field,
-                    args.config_update.keys(),
-                    args.config_update.values(),
-                )
+                for key, value in args.config_update.items():
+                    update_field(field_name=key, value=value)
         case "run":
             dbcons = DBCONS
             dbcons["database"] = args.database
