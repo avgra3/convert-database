@@ -1,18 +1,37 @@
 from .query import Conversion
-from .constants import dbCons, TABLES_SCRIPT, LOGGER
+from .constants import TABLES_SCRIPT, LOGGER
+from neil import NeilPool
+from enum import StrEnum, auto
+import logging
 
 
-def getTablesToConvert(database: str) -> list[tuple[str]]:
-    dbCons["database"] = database
-    conv = Conversion(dbCons=dbCons)
-    script = TABLES_SCRIPT.read_text().replace("<DATABASE_NAME>", database)
-    LOGGER.info(f"getting tables to convert for `{database}`...")
-    results = conv.getTablesToConvert(script=script)
-    return results
+class LoggingOptions(StrEnum):
+    INFO = auto()
+    DEBUG = auto()
+    WARNING = auto()
+    ERROR = auto()
+    CRITICAL = auto()
 
 
-def alterTables(database: str, alters: list[tuple[str]]) -> None:
-    dbCons["database"] = database
-    conv = Conversion(dbCons=dbCons)
-    LOGGER.info(f"converting tables for `{database}`...")
-    conv.run_alters_mp(alters=alters)
+def verbose_level(level: str) -> None:
+    match LoggingOptions(level.strip().lower()):
+        case LoggingOptions.INFO:
+            LOGGER.setLevel(logging.INFO)
+        case LoggingOptions.DEBUG:
+            LOGGER.setLevel(logging.DEBUG)
+        case LoggingOptions.WARNING:
+            LOGGER.setLevel(logging.WARNING)
+        case LoggingOptions.ERROR:
+            LOGGER.setLevel(logging.ERROR)
+        case LoggingOptions.CRITICAL:
+            LOGGER.setLevel(logging.CRITICAL)
+        case _:
+            LOGGER.setLevel(logging.WARNING)
+
+
+def run_conversions(dbPool: NeilPool):
+    conv: Conversion = Conversion(dbPool=dbPool)
+    database: str = str(dbPool.dbCons.get("database", ""))
+    script: str = TABLES_SCRIPT.read_text().replace("<DATABASE_NAME>", database)
+    dbPool.log.info(f"getting tables to convert for `{database}`...")
+    conv.run_all(getting_sql_tables=script)

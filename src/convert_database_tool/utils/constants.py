@@ -5,11 +5,11 @@ import tomllib
 
 
 def get_data_file(name: str) -> Path:
-    return files("convert_database_tool") / "SCRIPTS" / name
+    return Path(str(files("convert_database_tool") / "SCRIPTS" / name))
 
 
 def get_config_file(name: str) -> Path:
-    return files("convert_database_tool") / "configs" / name
+    return Path(str(files("convert_database_tool") / "configs" / name))
 
 
 def db_config_toml() -> dict:
@@ -18,7 +18,7 @@ def db_config_toml() -> dict:
         return tomllib.load(file)["database_config"]
 
 
-dbCons = db_config_toml()
+DBCONS = db_config_toml()
 
 logging.basicConfig(
     level=logging.DEBUG,

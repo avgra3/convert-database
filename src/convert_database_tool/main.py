@@ -1,13 +1,16 @@
-from convert_database_tool.utils.utils import getTablesToConvert, alterTables
+from convert_database_tool.utils.constants import DBCONS
+from neil import NeilPool, NeilConfig
+from convert_database_tool.utils.utils import run_conversions, verbose_level
 from convert_database_tool.utils.constants import (
     LOGGER,
     get_config_file,
     get_data_file,
 )
-from convert_database_tool.utils.update_config import update_field
 from convert_database_tool.utils.update_sql import update_query
+from convert_database_tool.utils.update_config import update_field
 import argparse
 from pathlib import Path
+import json
 
 
 def main():
@@ -15,67 +18,112 @@ def main():
         prog="Database Conversion Tool",
         description="Make changes to every table in a database",
     )
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-d", "--db", help="Database name")
-    group.add_argument(
-        "-c",
-        "--dbConfig",
-        action="store_true",
-        help="Flag to return location of dbConfig.toml",
+    # Shared Argument across other parsers
+    shared_parser = argparse.ArgumentParser(add_help=False)
+    shared_parser.add_argument(
+        "--verbosity",
+        type=verbose_level,
+        required=False,
+        default="info",
+        help="Levels of logging: info, debug, warning, error, critical",
     )
-    group.add_argument(
+
+    subparsers = parser.add_subparsers(
+        dest="command", help="Available commands"
+    )
+
+    # Information
+    info_parser = subparsers.add_parser(
+        "info",
+        help="Information about your SQL or config file",
+        parents=[shared_parser],
+    )
+    info_parser.add_argument(
+        "-d", "--db", action="store_true", help="Current Database name"
+    )
+    info_parser.add_argument(
+        "-c",
+        "--config",
+        action="store_true",
+        help="Return location of dbConfig.toml",
+    )
+    info_parser.add_argument(
         "-q",
         "--query",
         action="store_true",
-        help="Get location of query ran by the app to make the update(s)",
+        help="Get location of SQL query to run",
     )
-    group.add_argument(
-        "-f",
-        "--field_update",
-        help="""Select a field such as `user`, `password`, `host`, `port`.
-        Update the value with the -v flag below.""",
+
+    # Update items
+    update_parser = subparsers.add_parser(
+        "update",
+        help="Information about your SQL or config file",
+        parents=[shared_parser],
     )
-    group.add_argument(
+    update_parser.add_argument(
         "-m",
-        "--query_update",
-        action="store_true",
-        help="Update the SQL update file",
+        "--querry-update",
+        type=Path,
+        help="Update the SQL file with a file",
     )
-    parser.add_argument(
-        "-v",
-        "--value",
-        help="Field value or new SQL query file to set.",
+    update_parser.add_argument(
+        "-c",
+        "--config-update",
+        type=parse_dict,
+        help="Update the config file with a new value: {key: value}",
     )
+
+    # Run alterations
+    run_parser = subparsers.add_parser(
+        "run", help="Run the desired alterations"
+    )
+    run_parser.add_argument(
+        "-d",
+        "--database",
+        type=str,
+        default=DBCONS.get("database", ""),
+        help="Database we are performing updates to. Defaults to database defined in config file.",
+    )
+
     args = parser.parse_args()
-    if args.dbConfig:
-        config_location()
-        return
-    if args.query:
-        script_location()
-        return
-    if args.query_update:
-        if args.value is None:
-            LOGGER.warning("You did not provide a file to swap to")
-            return
-        if not Path(args.value).exists():
-            LOGGER.warning(f"`{args.value}` does not exist")
-        if not Path(args.value).is_file():
-            LOGGER.warning(f"`{args.value}` is not a file")
-        update_query(file=Path(args.value))
-        return
-    if args.field_update is not None:
-        if args.value is not None:
-            update_field(field_name=args.field_update, value=args.value)
-        else:
-            LOGGER.warning("You did not provide a value to change field to")
-        return
-    LOGGER.info("Starting process...")
-    tables_to_alter = getTablesToConvert(database=args.db)
-    alterTables(database=args.db, alters=tables_to_alter)
-    LOGGER.info("Finished.")
-    LOGGER.info(
-        "Please review the database and any errors which may have occurred."
-    )
+    match args.command:
+        case "info":
+            if args.db:
+                current_db()
+            if args.config:
+                config_location()
+            if args.query:
+                script_location()
+        case "update":
+            if args.querry_update:
+                update_query(file=args.query)
+            if args.config_update:
+                map(
+                    update_field,
+                    args.config_update.keys(),
+                    args.config_update.values(),
+                )
+        case "run":
+            dbcons = DBCONS
+            dbcons["database"] = args.database
+            config: NeilConfig = NeilConfig(**dbcons)
+            pool: NeilPool = NeilPool(conns=config)
+            run_conversions(dbPool=pool)
+        case _:
+            parser.print_help()
+
+
+def parse_dict(input: str) -> dict:
+    try:
+        out = json.loads(input)
+        return out
+    except:
+        LOGGER.critical(f"Unable to parse input: `{input}`")
+        return {}
+
+
+def current_db():
+    LOGGER.info(f"Current db: {DBCONS['database']}")
 
 
 def config_location():
