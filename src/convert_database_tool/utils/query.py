@@ -21,7 +21,7 @@ class Conversion:
 
     def run_queries(self, queries: list[str]) -> None:
         with ThreadPoolExecutor(max_workers=self.dbPool.pool_size) as executor:
-            _ = executor.map(self.dbPool.execute_script, queries)
+            _ = executor.map(self.dbPool.execute_sql, queries)
 
     def run_all(self, *, getting_sql_tables: str) -> None:
         tables_to_convert = self.getTablesToConvert(script=getting_sql_tables)
