@@ -84,6 +84,13 @@ def main():
         default=DBCONS.get("database", ""),
         help="Database we are performing updates to. Defaults to database defined in config file.",
     )
+    run_parser.add_argument(
+        "-p",
+        "pool-size",
+        type=int,
+        default=3,
+        help="Number of available connections for our pool.",
+    )
 
     args = parser.parse_args()
     match args.command:
@@ -107,7 +114,9 @@ def main():
             dbcons = DBCONS
             dbcons["database"] = args.database
             config: NeilConfig = NeilConfig(**dbcons)
-            pool: NeilPool = NeilPool(conns=config)
+            pool: NeilPool = NeilPool(
+                conns=config, logger=LOGGER, pool_size=args.pool_size
+            )
             run_conversions(dbPool=pool)
         case _:
             parser.print_help()
