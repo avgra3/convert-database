@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser(
         prog="Database Conversion Tool",
         description="Make changes to every table in a database",
+        add_help=True,
     )
     # Shared Argument across other parsers
     shared_parser = argparse.ArgumentParser(add_help=False)
@@ -86,7 +87,7 @@ def main():
     )
     run_parser.add_argument(
         "-p",
-        "pool-size",
+        "--pool-size",
         type=int,
         default=3,
         help="Number of available connections for our pool.",
