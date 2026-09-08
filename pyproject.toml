@@ -1,6 +1,6 @@
 [project]
 name = "convert-database-tool"
-version = "0.3.5"
+version = "0.3.6"
 description = "A simple tool to make updates to a database."
 readme = "README.md"
 authors = [

@@ -29,4 +29,4 @@ class Conversion:
         tables_to_convert = self.getTablesToConvert(script=getting_sql_tables)
         if tables_to_convert is None or len(tables_to_convert) == 0:
             return
-        self.run_queries(queries=tables_to_convert)
+        self.run_queries(queries=[sql for sql in tables_to_convert if sql.strip() != "" and sql.strip() !=";"])
