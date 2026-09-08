@@ -13,7 +13,9 @@ class Conversion:
             sql_script=script
         )
         results: list[str] = [
-            "; ".join((str(s) for s in sql.returnedData))
+            "; ".join(
+                (str(s) for s in sql.returnedData if str(s).strip() != "")
+            )
             for sql in query_result
             if sql.returnedData is not None
         ]
